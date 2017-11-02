@@ -34,6 +34,12 @@ Cara Menjalankan Botnya :
 - cd KoplaxsBotProtect
 - python KoplaxsProtect.py
 
+Video Tutor :
+https://youtu.be/Jq_nyqFe7o4
+
+Cara edit File lewat Nano(no root)
+https://youtu.be/q7zYkOv_ZAA
+
 Ada Pertanyaan?
 Add My Line => @hanavy1992
 
