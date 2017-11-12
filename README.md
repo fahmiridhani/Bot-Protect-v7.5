@@ -38,7 +38,7 @@ Video Tutor :
 https://youtu.be/yYu6ZmiM_YI
 
 Cara edit File lewat Nano(no root)
-https://youtu.be/q7zYkOv_ZAA
+https://youtu.be/Iim_uFMrpCU
 
 Ada Pertanyaan?
 Add My Line => @hanavy1992
