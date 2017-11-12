@@ -31,13 +31,13 @@ Cara Instal :
 - pip2 install requests
 
 Cara Menjalankan Botnya :
-- cd KoplaxsBotProtect
-- python KoplaxsProtect.py
+- cd Koplaxs5Bot
+- python Koplaxs5Bot.py
 
-Video Tutor :
+Video Tutor :(HP Root)
 https://youtu.be/yYu6ZmiM_YI
 
-Cara edit File lewat Nano(no root)
+Video Tutor :(No Root)
 https://youtu.be/Iim_uFMrpCU
 
 Ada Pertanyaan?
@@ -47,6 +47,6 @@ Thanks For :
 - Alfathdirk
 - Farzain
 - Dan Kawan²
-=======================
-Koplaxs & One Piece Bot
-=======================
+================================
+Koplaxs & One Piece Team Protect
+================================
