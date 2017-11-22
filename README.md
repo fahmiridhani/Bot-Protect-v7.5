@@ -32,7 +32,7 @@ Cara Instal :
 
 Cara Menjalankan Botnya :
 - cd Koplaxs5Bot
-- python Koplaxs5Bot.py
+- python2 Koplaxs5Bot.py
 
 Video Tutor :(HP Root)
 https://youtu.be/yYu6ZmiM_YI
