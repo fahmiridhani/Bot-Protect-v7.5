@@ -1,4 +1,4 @@
-# Koplaxs5Bot
+[New] Bot Saling Backup Dan Admin Di Undang Jika Ke Kick
 Bot Protect Versi  1 admin dan 5  Bot
 # Koplaxs 5 Bot
 Koplaxs BOT Protect
