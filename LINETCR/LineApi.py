@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import requests,shutil,random,string,json,os,tempfile
+import requests,shutil,random,string,json,tempfile,urllib,urllib2,urllib3
 import unicodedata
-from Api import Poll, Talk, channel
 from random import randint
+from Api import Poll, Talk, channel
 from time import time
 from datetime import datetime
 from lib.curve.ttypes import *
@@ -24,7 +24,6 @@ class LINE:
   def __init__(self):
     self.Talk = Talk()
     self._session = requests.session()
-    self._headers = {'X-Line-Application': 'IOSIPAD\t7.14.0\tiPhone OS\t10.12.0', 'X-Line-Access': 'Emp1jl3qOjxCjXEhmaN5.QdLXoVPaKOU6WpvD80Sijq.NcwnmLOaI/dIyi3Y84WTCOxbNTN27m3ODDpkMLDPY64=', 'User-Agent': 'Line/7.14.0'}
 
   def login(self, mail=None, passwd=None, cert=None, token=None, qr=False, callback=None):
     if callback is None:
@@ -42,20 +41,21 @@ class LINE:
       raise Exception("invalid arguments")
 
     self.authToken = self.Talk.authToken
+    self._headers = {'X-Line-Application': 'CHROMEOS\t1.7.14\tChrome_OS\t1', 'X-Line-Access': self.authToken, 'User-Agent': 'Line/1.7.14'}
     self.cert = self.Talk.cert
     self._headers = {
-              'X-Line-Application': 'IOSIPAD\t7.14.0\tiPhone OS\t10.12.0', 
+              'X-Line-Application': 'CHROMEOS\t1.7.14\tChrome_OS\t1', 
               'X-Line-Access': self.authToken, 
-              'User-Agent': 'Line/7.14.0'
+              'User-Agent': 'Line/1.7.14'
    }
     self.Poll = Poll(self.authToken)
-    self.channel = channel.Channel(self.authToken)
-    self.channel.login()	
-    self.mid = self.channel.mid
-    self.channel_access_token = self.channel.channel_access_token
-    self.token = self.channel.token
-    self.obs_token = self.channel.obs_token
-    self.refresh_token = self.channel.refresh_token
+    #self.channel = channel.Channel(self.authToken)
+    #self.channel.login()	
+    #self.mid = self.channel.mid
+    #self.channel_access_token = self.channel.channel_access_token
+    #self.token = self.channel.token
+    #self.obs_token = self.channel.obs_token
+    #self.refresh_token = self.channel.refresh_token
 
 
   """User"""
@@ -75,6 +75,9 @@ class LINE:
   def updateSettings(self, settingObject):
     return self.Talk.client.updateSettings(0, settingObject)
 
+  def updateSettings(self, settingObject):
+    return self.Talk.client.updateSettings(0, settingObject)
+
   def CloneContactProfile(self, mid):
     contact = self.getContact(mid)
     profile = self.getProfile()
@@ -86,25 +89,6 @@ class LINE:
 
   def updateDisplayPicture(self, hash_id):
     return self.Talk.client.updateProfileAttribute(0, 8, hash_id)
-
-  def updateProfilePicture(self, path):
-        file=open(path, 'rb')
-        files = {
-            'file': file
-        }
-        params = {
-            'name': 'media',
-            'type': 'image',
-            'oid': self.profile.mid,
-            'ver': '1.0',
-        }
-        data={
-            'params': json.dumps(params)
-        }
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
-        if r.status_code != 201:
-            raise Exception('Update profile picture failure.')
-        return True
 
   """Operation"""
 
@@ -125,18 +109,59 @@ class LINE:
   def sendMessage(self, messageObject):
         return self.Talk.client.sendMessage(0,messageObject)
 
-  def removeAllMessage(self, messageObject):
-        return self.Talk.client.removeAllMessage(0,lastMessageId)
-
+  def removeAllMessages(self, lastMessageId):
+        return self.Talk.client.removeAllMessages(0,lastMessageId)
+  
   def sendText(self, Tomid, text):
         msg = Message()
         msg.to = Tomid
         msg.text = text
 
         return self.Talk.client.sendMessage(0, msg)
+        
   def post_content(self, url, data=None, files=None):
         return self._session.post(url, headers=self._headers, data=data, files=files)
 
+  def kedapkedip(self, tomid, text):
+        M = Message()
+        M.to = tomid
+        t1 = "\xf4\x80\xb0\x82\xf4\x80\xb0\x82\xf4\x80\xb0\x82\xf4\x80\xb0\x82\xf4\x80\xa0\x81\xf4\x80\xa0\x81\xf4\x80\xa0\x81"
+        t2 = "\xf4\x80\x82\xb3\xf4\x8f\xbf\xbf"
+        rst = t1 + text + t2
+        M.text = rst.replace("\n", " ")
+        return self.Talk.client.sendMessage(0, M)  
+        
+  def sendMessageWithMention(self, to, text='', dataMid=[]):
+      arr = []
+      list_text=''
+      if '[list]' in text.lower():
+          i=0
+          for l in dataMid:
+              list_text+='\n@[list-'+str(i)+']'
+              i=i+1
+          text=text.replace('[list]', list_text)
+      elif '[list-' in text.lower():
+          text=text
+      else:
+          i=0
+          for l in dataMid:
+              list_text+=' @[list-'+str(i)+']'
+              i=i+1
+          text=text+list_text
+      i=0
+      for l in dataMid:
+          mid=l
+          name='@[list-'+str(i)+']'
+          ln_text=text.replace('\n',' ')
+          if ln_text.find(name):
+              line_s=int( ln_text.index(name) )
+              line_e=(int(line_s)+int( len(name) ))
+          arrData={'S': str(line_s), 'E': str(line_e), 'M': mid}
+          arr.append(arrData)
+          i=i+1
+      contentMetadata={'MENTION':str('{"MENTIONEES":' + json.dumps(arr).replace(' ','') + '}')}
+      return self.sendMessage(to, text, contentMetadata)
+  
   def sendImage(self, to_, path):
         M = Message(to=to_, text=None, contentType = 1)
         M.contentMetadata = None
@@ -157,22 +182,21 @@ class LINE:
         }       
 
         r = self.post_content('https://os.line.naver.jp/talk/m/upload.nhn', data=data, files=files)
-        #print r
+        print r
         if r.status_code != 201:
             raise Exception('Upload image failure.')
         return True
 
-  def sendImageWithUrl(self, to_, url):
+  def sendImageWithURL(self, to_, url):
         """Send a image with given image url
 
         :param url: image url to send
         """
-        path = '%s/pythonLine-%1.data' % (tempfile.gettempdir(), randint(0, 9))
-
+        path = 'tmp/pythonLine.data'
 
         r = requests.get(url, stream=True)
         if r.status_code == 200:
-            with open(path, 'w') as f:
+            with open(path, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
         else:
             raise Exception('Download image failure.')
@@ -181,47 +205,51 @@ class LINE:
             self.sendImage(to_, path)
         except Exception as e:
             raise e
-
+            
+  def getCover(self,mid):
+        h = self.getHome(mid)
+        objId = h["result"]["homeInfo"]["objectId"]
+        return "http://dl.profile.line-cdn.net/myhome/c/download.nhn?userid=" + mid + "&oid=" + objId
+        
   def sendVideo(self, to_, path):
-        M = Message(to=to_, text=None, contentType = 2)
-        M.contentMetadata = None
-        M.contentPreview = None
-        M2 = self.Talk.client.sendMessage(0,M)
-        M_id = M2.id
-        files = {
-            'file': open(path, 'rb'),
-        }
-        params = {
-            'name': 'media',
-            'oid': M_id,
-            'size': len(open(path, 'rb').read()),
-            'type': 'video',
-            'ver': '1.0',
-        }
-        data = {
-            'params': json.dumps(params)
-        }
-        r = self.post_content('https://os.line.naver.jp/talk/m/upload.nhn', data=data, files=files)
-        #print r
-        if r.status_code != 201:
-            raise Exception('Upload video failure.')
-        return True
-
+      M = Message(to=to_,contentType = 2)
+      M.contentMetadata = {
+           'VIDLEN' : '0',
+           'DURATION' : '0'
+       }
+      M.contentPreview = None
+      M_id = self.Talk.client.sendMessage(0,M).id
+      files = {
+         'file': open(path, 'rb'),
+      }
+      params = {
+         'name': 'media',
+         'oid': M_id,
+         'size': len(open(path, 'rb').read()),
+         'type': 'video',
+         'ver': '1.0',
+      }
+      data = {
+         'params': json.dumps(params)
+      }
+      r = self.post_content('https://os.line.naver.jp/talk/m/upload.nhn', data=data, files=files)
+      if r.status_code != 201:
+         raise Exception('Upload image failure.')
+      return True
+      
   def sendVideoWithURL(self, to_, url):
-        path = '%s/pythonLine-%i.data' % (tempfile.gettempdir(), randint(0, 9))
-
-        r = requests.get(url, stream=True)
-        if r.status_code == 200:
-            with open(path, 'w') as f:
-                shutil.copyfileobj(r.raw, f)
-        else:
-            raise Exception('Download video failure.')
-
-        try:
-            self.sendVideo(to_, path)
-        except Exception as e:
-            raise (e)
-
+      path = 'pythonLines.data'
+      r = requests.get(url, stream=True)
+      if r.status_code == 200:
+         with open(path, 'w') as f:
+            shutil.copyfileobj(r.raw, f)
+      else:
+         raise Exception('Download Video failure.')
+      try:
+         self.sendVideo(to_, path)
+      except Exception as e:
+         raise e
+      
   def sendAudio(self, to_, path):
         M = Message(to=to_, text=None, contentType = 3)
         M.contentMetadata = None
@@ -241,29 +269,47 @@ class LINE:
         data = {
             'params': json.dumps(params)
         }
-        r = self.post_content('https://os.line.naver.jp/talk/m/upload.nhn', data=data, files=files)
+        r = self.post_content('https://obs-sg.line-apps.com/talk/m/upload.nhn', data=data, files=files)
         if r.status_code != 201:
             raise Exception('Upload audio failure.')
         return True
 
-  def sendAudioWithUrl(self, to_, url):
-        path = '%s/pythonLine-%1.data' % (tempfile.gettempdir(), randint(0, 9))
-
+  def sendAudioWithURL(self, to_, url):
+        path = '%s/pythonLine-%i.data' % (tempfile.gettempdir(), randint(0, 9))
         r = requests.get(url, stream=True)
         if r.status_code == 200:
-            with open(path, 'w') as f:
-                shutil.copyfileobj(r.raw, f)
+            with open(path, 'wb') as f:
+              r.raw.decode_content = True
+              shutil.copyfileobj(r.raw, f)
         else:
-            raise Exception('Download audio failure.')
-
+            raise Exception('Download Audio failure.')
         try:
             self.sendAudio(to_, path)
         except Exception as e:
-            raise (e)
+          print e
+  
+  def downloadFileURL(self, fileUrl):
+      saveAs = '%s/linepython-%i.data' % (tempfile.gettempdir(), randint(0, 9))
+      r = self.getContent(fileUrl, headers=self._headers)
+      if r.status_code == 200:
+          with open(saveAs, 'wb') as f:
+              hutil.copyfileobj(r.raw, f)
+          return saveAs
+      else:
+          raise Exception('Download file failure.')
 
-  def removeAllMessages(self, lastMessageId):
-	return self.Talk.client.removeAllMessages(0, lastMessageId)
-
+  def downloadObjectMsgId(self, messageId):
+        saveAs = '%s/%s-%i.bin' % (tempfile.gettempdir(), messageId, randint(0, 9))
+        params = {'oid': messageId}
+        url = self.server.urlEncode('https://obs.line-apps.com', '/talk/m/download.nhn', params)
+        r = self.server.getContent(url)
+        if r.status_code == 200:
+            with open(saveAs, 'wb') as f:
+				shutil.copyfileobj(r.raw, f)			
+				return saveAs
+        else:
+            raise Exception('Download file failure.')
+        
   def sendEvent(self, messageObject):
         return self._client.sendEvent(0, messageObject)
 
@@ -441,8 +487,21 @@ class LINE:
 
   def createAlbum2(self, gid, name, path):
       return self.channel.createAlbum(gid, name, path, oid)
-
-
+      
+  """Personalize"""
+    
+  def cloneContactProfile(self, mid):
+      contact = self.getContact(mid)
+      profile = self.getProfile()
+      profile.displayName = contact.displayName
+      profile.statusMessage = contact.statusMessage
+      profile.pictureStatus = contact.pictureStatus
+      self.updateDisplayPicture(profile.pictureStatus)
+      return self.updateProfile(profile)
+  
+  def updateDisplayPicture(self, hash_id):
+      return self.Talk.client.updateProfileAttribute(0, 8, hash_id)
+            
   def __validate(self, mail, passwd, cert, token, qr):
     if mail is not None and passwd is not None and cert is None:
       return 1
@@ -461,83 +520,9 @@ class LINE:
 
       prof = self.getProfile()
 
-      print("One Piece BOT")
-      print("mid -> " + prof.mid)
-      print("Nama -> " + prof.displayName)
-      print("Token -> " + self.authToken)
-      print("cert -> " + self.cert if self.cert is not None else "")
-
-
-
-class AniSearch(object):
-  ## REQUIRED : urllib , requests
-  def __init__(self, path):
-    self.pic_path = path
-    self.b64img = None
-    self.season = None; self.anime = None
-  def image_b64(self):
-    with open(self.pic_path, 'rb') as img_file:
-      encode_str = img_file.read()
-      self.b64img = encode_str.encode('base64')
-  def get_info(self, season, anime):
-    js = self.get_info_(season,anime)
-    ret_r = []
-    for item in js:
-      ret = {}
-      ret['name_en'] = item['title_english']
-      ret['name_jp'] = item['title_japanese']
-      ret['genres'] = item['genres']
-      ret['s_type'] = item['series_type']
-      ret_r.append(ret)
-    return ret_r
-  def get_data(self, json):
-    js = json;
-    results = js['docs']
-    ret = []
-    for result in results:
-      try:
-        season = result['season']
-        anime = result['anime']
-        file = result['file']
-        start_ = result['start']
-        end___ = result['end']
-        token = result['token']
-        token_ = result['tokenthumb']
-        t__ = result['to']
-        ncoded_anime = urllib.quote(anime) ; ncoded_file = urllib.quote(file)
-        url_r = 'https://whatanime.ga/' + season + '/' + ncoded_anime + '/' + ncoded_file
-        url_r += '?start={0}&end={1}&token={2}'.format(start_,end___,token)
-        url_t = 'https://whatanime.ga/thumbnail.php?season={0}&anime={1}&file={2}&t={3}&token={4}'.format(season,ncoded_anime,ncoded_file,t__,token_)
-        ret.append({'video':url_r,'thumbnail':url_t,'anime_name':anime,'season':season})
-      except Exception as e:
-        pass
-    return ret
-  def get_info_(self, season, anime):
-    header = {
-      'Referer':'https://whatanime.ga/',
-      'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
-      'x-requested-with':'XMLHttpRequest',
-    }
-    url = 'https://whatanime.ga/info?season={0}&anime={1}'.format(season, urllib.quote(anime));
-    r = requests.get(url, headers=header)
-    return r.json()
-  def post_image(self):
-    try:
-      self.image_b64()
-    except Exception as e: raise Exception("Image cant be converted.");
-    payload = "data=data:image/jpeg;base64," + self.b64img
-    payload += '&filter=*&trial=4'
-    header = {
-      'Host':'whatanime.ga',
-      'accept':'application/json, text/javascript, */*; q=0.01',
-      'content-type':'application/x-www-form-urlencoded; charset=UTF-8',
-      'origin':'https://whatanime.ga',
-      'referer':'https://whatanime.ga/',
-      'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
-      'x-requested-with':'XMLHttpRequest',
-    }
-    r = requests.post('https://whatanime.ga/search', data=payload, headers=header)
-    if r.status_code == 200:
-      return r.json()
-    else:
-      raise Exception("Post failed.")
+      print("=============[SHINIGAMI FOR BOT]=============")
+      print("====================================================")
+      print("MID : " + prof.mid)
+      print("NAME : " + prof.displayName)
+      print("authToken :  " + self.authToken)
+      print("cert : " + self.cert if self.cert is not None else "")
