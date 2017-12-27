@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import FAHMISELFBOT
-from FAHMISELFBOT.lib.curve.ttypes import *
+import LINETCR
+from LINETCR.lib.curve.ttypes import *
 from datetime import datetime
 import time, random, sys, ast, re, os, io, json, subprocess, threading, string, codecs, requests, tweepy, ctypes, urllib, urllib2, wikipedia, goslate
 import timeit
@@ -21,7 +21,7 @@ else:
     import urllib.request
     import urllib.parse
 
-cl = FAHMISELFBOT.LINE()
+cl = LINETCR.LINE()
 cl.login(token="EozE7Whx0lzekZymITA7.16J7ZcRWn8lfVXGBIF2L9W.GRhbLq5rMhTQvtwEB5LMA6QDTfRQC5eWSTl+rtTp6YI=")
 cl.loginResult()
 
