@@ -20,8 +20,8 @@ class Talk:
   host = "gd2.line.naver.jp";
   port = 443;
 
-  UA = "Line/7.14.0"
-  LA = "IOSIPAD\t7.14.0\tiPhone OS\t10.12.0"
+  UA = "Line/1.7.14"
+  LA = "CHROMEOS\t1.7.14\tChrome_OS\t1"      
 
   authToken = None
   cert = None
@@ -90,7 +90,7 @@ class Talk:
     self.transport.path = self.auth_query_path
 
     qr = self.client.getAuthQrcode(True, "Bot")
-    callback("Copy Kode QR nya Plak\nJangan Lama2\nBatas 1 menit:\n line://au/q/" + qr.verifier)
+    callback("Copy to Line and Click\nYour LINK QR is: line://au/q/" + qr.verifier)
 
     r = requests.get("https://" + self.host + self.wait_for_mobile_path, headers={
       "X-Line-Application": self.LA,
