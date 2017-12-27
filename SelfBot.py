@@ -22,7 +22,7 @@ else:
     import urllib.parse
 
 cl = LINETCR.LINE()
-cl.login(token="EozE7Whx0lzekZymITA7.16J7ZcRWn8lfVXGBIF2L9W.GRhbLq5rMhTQvtwEB5LMA6QDTfRQC5eWSTl+rtTp6YI=")
+cl.login(token="(Isi TOKEN Kamu)")
 cl.loginResult()
 
 print "==================[Login Success]==================="
@@ -69,8 +69,8 @@ helpself ="""╔═════════════════
 ╠➩〘Getpict @〙
 ╠➩〘Getcover @〙
 ╠➩〘Mention〙
-╠➩〘Lurk on/off〙
-╠➩〘Lurkers〙
+╠➩〘Sider on/off〙
+╠➩〘Sider〙
 ╠➩〘Mimic on/off〙
 ╠➩〘Micadd @〙
 ╠➩〘Micdel @〙
@@ -102,8 +102,6 @@ helpgrup ="""╔═════════════════
 ╠➩〘Ulti @〙
 ╠➩〘Cancel〙
 ╠➩〘Gname: 〙
-╠➩〘Gbroadcast: 〙
-╠➩〘Cbroadcast: 〙
 ╠➩〘Infogrup〙
 ╠➩〘Gruplist〙
 ╠➩〘Friendlist〙
