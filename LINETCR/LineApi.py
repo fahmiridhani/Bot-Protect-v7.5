@@ -520,8 +520,9 @@ class LINE:
 
       prof = self.getProfile()
 
-      print("=============[SHINIGAMI FOR BOT]=============")
-      print("====================================================")
+      print("=============[SHINIGAMI FOR BOT]==============")
+      print("====[ Editing for Muhammad Fahmi Ridhani ]====")
+      print("==============================================")
       print("MID : " + prof.mid)
       print("NAME : " + prof.displayName)
       print("authToken :  " + self.authToken)
