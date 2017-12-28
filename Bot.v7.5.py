@@ -93,7 +93,7 @@ helpinvite= """╔═══════════════════
 ╠回 Join all [Untuk Memanggil Semua Asist]
 ╠回 Bye [Untuk Mengeluarkan Semua Asist]
 ╠回 Kiker join [Untuk Memanggil Bot Kicker]
-╠回 Kiker out [Untuk Mengeluarkan Bot Kicker]
+╠回 Kiker out [Mengeluarkan Bot Kicker]
 ╠回 Bye all [Untuk Mengeluarkan Semua Bot]
 ╠回 Bot the end [Command for Creator]
 ╠
@@ -154,8 +154,6 @@ helpsystem= """╔═══════════════════
 ╠回 Admin off [Tag Target]
 ╠回 Owner on [Tag Target]
 ╠回 Owner off [Tag Target]
-╠回 Admin:on [Send Contact]
-╠回 Owner:on [Send Contact]
 ╠
 ╚═══════════════════
 
@@ -2024,17 +2022,6 @@ def bot(op):
                 else:
                     cl.sendText(msg.to,"Command denied.")
                     cl.sendText(msg.to,"owner permission required.")
-#==========================================================
-            elif "Admin:on" in msg.text:
-              if msg.from_ in owner and creator:
-                msg.contentType = 13
-                msg.contentMetadata = {'mid': admin}
-                cl.sendMessage(msg)       
-            elif "Owner:on" in msg.text:
-              if msg.from_ in creator:
-                msg.contentType = 13
-                msg.contentMetadata = {'mid': owner}
-                cl.sendMessage(msg)
 #==========================================================
             elif 'bot mid' in msg.text.lower():
                if msg.from_ in admin:
