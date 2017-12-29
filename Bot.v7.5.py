@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#Tolong Jangan Ganti Creator Hargai Yang Membuat
 import LINETCR
 from LINETCR.lib.curve.ttypes import *
 from datetime import datetime
@@ -1868,6 +1868,7 @@ def bot(op):
                     cl.sendText(msg.to,contact.statusMessage)
                 except:
                     cl.sendText(msg.to,contact.statusMessage)
+#Tolong Jangan Ganti mid CreatorNya Hargai Saya yang membuat!!!#
             elif msg.text in ["Creator"]:
                 msg.contentType = 13
                 msg.contentMetadata = {'mid': 'ud7a8fbcc2af037c2c5bf181b89fda5f7'}
